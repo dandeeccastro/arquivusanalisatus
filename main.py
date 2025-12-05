@@ -2,9 +2,14 @@ import os
 import csv
 import threading
 import re
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import hashlib
 
+def load_dotenv():
+    with open('.env') as env:
+        data = env.read()
+        target_dir = data.split('=')[1]
+        return target_dir.strip()
 
 class Node:
     def __init__(self, parent, children, path, uuid, name, filetype, hash):
@@ -174,11 +179,10 @@ graph = {}
 
 
 if __name__ == '__main__':
-    load_dotenv()
 
     # load_graph_from_csv('./testing.csv')
 
-    main_dir = os.getenv('TARGET_DIR')
+    main_dir = load_dotenv()
     build_graph(main_dir)
     write_graph_to_csv(os.path.basename(main_dir))
 
