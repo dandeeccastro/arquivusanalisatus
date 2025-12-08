@@ -1,3 +1,4 @@
+import sys
 import os
 import csv
 import threading
@@ -96,7 +97,7 @@ def write_graph_to_csv(filename):
             file.write(node.print_csv_line())
 
 
-def load_graph_from_csv(csvfile):
+def build_graph_from_csv(csvfile):
     with open(csvfile) as f:
         csvreader = csv.reader(f, delimiter=';')
         for row in csvreader:
@@ -174,15 +175,23 @@ def print_graph():
     for node in graph.values():
         print("\t".join([node.name, str(node.parent), node.hash]))
 
+def check_correctedness(main_dir):
+    root_node = build_graph_from_csv("./{}.csv".format(main_dir))
+    # TODO: implement DFS on both trees to check for correctedness
 
 graph = {}
 
 
 if __name__ == '__main__':
 
-    # load_graph_from_csv('./testing.csv')
-
     main_dir = load_dotenv()
+    # build_graph_from_csv('./testing.csv')
+    if len(sys.argv) > 1:
+        flag = sys.argv[1]
+        if flag == '-c':
+            check_correctedness(main_dir)
+            return
+
     build_graph(main_dir)
     write_graph_to_csv(os.path.basename(main_dir))
 
