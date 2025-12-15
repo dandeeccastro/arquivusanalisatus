@@ -117,6 +117,7 @@ def generate_graph_csv_from_path(path):
 
 
 def write_graph_to_csv(filename):
+    print(filename)
     with open("{}.csv".format(filename), "w") as file:
         file.write(Node.print_csv_header())
         for node in graph.values():
@@ -160,6 +161,9 @@ def generate_graph(path, parent=None, recursive=True, should_calculate=True):
         parent=parent, children=[], path=path, should_calculate_hash=should_calculate
     )
     graph[node.uuid] = node
+
+    if parent:
+        parent.children.append(node)
 
     if os.path.isfile(path):
         return node
@@ -256,7 +260,6 @@ def are_trees_equal(node_a, node_b):
     if len(node_a.children) != len(node_b.children):
         return False
 
-    print(node_a.children, node_b.children)
     result = node_a.path == node_b.path
     for i in range(len(node_a.children)):
         result = result and are_trees_equal(node_a.children[i], node_b.children[i])
@@ -279,5 +282,6 @@ if __name__ == "__main__":
         write_graph_to_csv(os.path.basename(main_dir))
     else:
         build_graph_from_filesystem(main_dir)
+        print(main_dir)
         write_graph_to_csv(os.path.basename(main_dir))
         check_for_duplicates()
