@@ -317,6 +317,7 @@ if __name__ == "__main__":
                         raise ValueError(f"Target not set!\n{help()}")
                     else:
                         target_dir = flags[idx]
+                        should_check_filesystem_full = True
             elif flags[idx] == "-c" or flags[idx] == "--check":
                 should_check_correctedness = True
             elif flags[idx] == "-d" or flags[idx] == "--debug":
