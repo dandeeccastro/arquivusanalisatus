@@ -1,19 +1,9 @@
 import csv
-
-# from dotenv import load_dotenv
 import hashlib
 import os
 import re
 import sys
 import threading
-
-
-def load_dotenv():
-    """Loads main_dir from .env file"""
-    with open(".env") as env:
-        data = env.read()
-        target_dir = data.split("=")[1]
-        return target_dir.strip()
 
 
 class Node:
@@ -303,15 +293,59 @@ def are_trees_equal(node_a, node_b):
     return result
 
 
+def help():
+    """Prints help message"""
+    return """Usage:
+        -t, --target <DIR>: filesystem to be checked (OBRIGATORY)
+        -c, --check: validates if csv and filesystem trees are equal
+        -d, --debug: generate a csv without calculating hashes
+        -h, --help: Prints this message!"""
+
+
 if __name__ == "__main__":
-    main_dir = load_dotenv()
-    if len(sys.argv) > 1 and sys.argv[1] == "-c":
-        are_equal = check_correctedness(main_dir)
-        print("Are files equal? {}".format(are_equal))
-    elif len(sys.argv) > 1 and sys.argv[1] == "-d":
-        root = build_graph_from_filesystem(main_dir, should_calculate=False)
-        write_graph_to_csv(os.path.basename(main_dir), root)
+    target_dir = None
+
+    should_print_help = False
+    should_check_correctedness = False
+    should_check_filesystem_full = False
+    should_check_filesystem_simple = False
+
+    # Parsing arguments
+    if len(sys.argv) > 1:
+        flags = sys.argv[1:]
+        for idx in range(len(flags)):
+            if flags[idx] == "-t" or flags[idx] == "--target":
+                if idx + 1 >= len(flags):
+                    raise ValueError(f"Target not set!\n{help()}")
+                else:
+                    idx += 1
+                    if flags[idx] in ["-c", "-d", "-h", "--check", "--debug", "--help"]:
+                        raise ValueError(f"Target not set!\n{help()}")
+                    else:
+                        target_dir = flags[idx]
+            elif flags[idx] == "-c" or flags[idx] == "--check":
+                should_check_correctedness = True
+            elif flags[idx] == "-d" or flags[idx] == "--debug":
+                should_check_filesystem_simple = True
+            elif flags[idx] == "-h" or flags[idx] == "--help":
+                should_print_help = True
+
+        curr_dir = os.path.basename(str(target_dir))
+        if target_dir is None:
+            raise ValueError(f"Target not set!\n{help()}")
+        elif should_print_help:
+            help()
+        elif should_check_correctedness:
+            are_equal = check_correctedness(target_dir)
+            print("Are files equal? {}".format(are_equal))
+        elif should_check_filesystem_simple:
+            root = build_graph_from_filesystem(target_dir, should_calculate=False)
+            write_graph_to_csv(curr_dir, root)
+        elif should_check_filesystem_full:
+            root = build_graph_from_filesystem(target_dir)
+            write_graph_to_csv(curr_dir, root)
+            check_for_duplicates(root)
+        else:
+            raise ValueError(f"Incorrect arguments\n{help()}")
     else:
-        root = build_graph_from_filesystem(main_dir)
-        write_graph_to_csv(os.path.basename(main_dir), root)
-        check_for_duplicates(root)
+        raise ValueError(f"Missing arguments!\n{help()}")
