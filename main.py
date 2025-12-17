@@ -111,12 +111,6 @@ def write_graph_to_csv(filename, root_node: Node):
             file.write(node.print_csv_line())
             nodes += node.children
 
-    # with open("{}.csv".format(filename), "w") as file:
-    #     file.write(Node.print_csv_header())
-    #     for node in graph.values():
-    #         print(node.uuid, node.parent)
-    #         file.write(node.print_csv_line())
-
 
 def build_graph_from_csv(csvfile):
     """Builds a node graph from CSV graph data.
