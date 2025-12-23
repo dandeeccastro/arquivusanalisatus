@@ -122,7 +122,11 @@ def build_graph_from_csv(csvfile):
     root = None
     graph = {}
     with open(csvfile) as f:
-        csvreader = csv.reader(f, delimiter=";")
+        csv.field_size_limit(sys.maxsize)
+        csvreader = csv.reader(
+            f,
+            delimiter=";",
+        )
         idx = 0
         for row in csvreader:
             if idx == 0:
