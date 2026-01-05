@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import threading
+from ctypes import pythonapi
 
 
 class Node:
@@ -38,8 +39,15 @@ class Node:
 
     @classmethod
     def from_csv(cls, row):
-        uuid, name, filetype, parent, path, hash, children = row
-        children = re.sub(r"[\[\]]", "", children).split(",")
+        uuid = row[0]
+        name = row[1]
+        filetype = row[2]
+        parent = row[3]
+        path = row[4]
+        hash = row[5]
+        children = row[6:]
+
+        # children = re.sub(r"[\[\]]", "", children).split(",")
 
         return cls(
             parent=parent,
@@ -89,11 +97,11 @@ class Node:
             str(self.parent),
             self.path,
             self.hash,
-            "{}".format(self.children),
         ]
-        csvl = ";".join(data)
 
-        return "{}\n".format(csvl)
+        csvl = ";".join(data)
+        tchotchongo = ";".join(list(map(lambda x: str(x), self.children)))
+        return f"{csvl};{tchotchongo}\n"
 
     def to_yaml(self):
         return f"""- uuid: {self.uuid}
@@ -262,7 +270,7 @@ class Graph:
                         c.append(graph[p])
                 node.children = c
 
-        return root
+        return cls(root=root)
 
     @classmethod
     def generate_node(cls, path, parent=None, recursive=True, should_calculate=True):
