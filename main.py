@@ -4,8 +4,6 @@ import os
 import re
 import sys
 import threading
-from ctypes import pythonapi
-
 
 class Node:
     def __init__(self, parent, children, path, uuid, name, filetype, hash):
